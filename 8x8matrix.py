@@ -6,6 +6,7 @@ CELL_SIZE = 50   # Each cell is 50x50 pixels
 
 # The string to be displayed in the matrix
 text = "PHOBICTIKVARTFEMPÅGOVERQHLAVDFEMFIRESEKSTOLVSJUXRXÅTTETTELLEVENI"
+highlight_text = "FIRE"  # The substring to highlight
 
 # Ensure the text length matches the matrix size
 if len(text) != MATRIX_SIZE * MATRIX_SIZE:
@@ -13,28 +14,31 @@ if len(text) != MATRIX_SIZE * MATRIX_SIZE:
 
 # Initialize the Tkinter window
 root = tk.Tk()
-root.title("8x8 Matrix with Inverted Colors")
+root.title("8x8 Matrix with Text")
 
 # Create a canvas to draw the matrix
 canvas = tk.Canvas(root, width=MATRIX_SIZE * CELL_SIZE, height=MATRIX_SIZE * CELL_SIZE, bg="black")
 canvas.pack()
 
-# Function to draw the 8x8 matrix on the canvas with letters and inverted colors
-def draw_matrix_with_text():
-    idx = 0  # Index to track the current character in the text
-    for i in range(MATRIX_SIZE):
-        for j in range(MATRIX_SIZE):
-            x1 = j * CELL_SIZE
-            y1 = i * CELL_SIZE
-            x2 = x1 + CELL_SIZE
-            y2 = y1 + CELL_SIZE
-            # Draw the cell with a black background
-            canvas.create_rectangle(x1, y1, x2, y2, outline="white", fill="black")
-            # Place the character in the center of the cell with white text
-            canvas.create_text(x1 + CELL_SIZE/2, y1 + CELL_SIZE/2, text=text[idx], fill="white", font=("Arial", 16))
-            idx += 1
+# Function to check if the character at position idx should be highlighted
+def should_highlight(idx):
+    for start_idx in range(max(0, idx - len(highlight_text) + 1), idx + 1):
+        if text[start_idx:start_idx + len(highlight_text)] == highlight_text:
+            return True
+    return False
 
-# Draw the matrix with text and inverted colors
+# Function to draw the 8x8 matrix on the canvas with letters
+def draw_matrix_with_text():
+    for idx, char in enumerate(text):
+        i, j = divmod(idx, MATRIX_SIZE)
+        x1 = j * CELL_SIZE
+        y1 = i * CELL_SIZE
+        # Determine text color (highlight if part of highlight_text)
+        text_color = "green" if should_highlight(idx) else "white"
+        # Draw the character in the cell
+        canvas.create_text(x1 + CELL_SIZE/2, y1 + CELL_SIZE/2, text=char, fill=text_color, font=("Arial", 16))
+
+# Draw the matrix with text
 draw_matrix_with_text()
 
 # Run the Tkinter event loop
